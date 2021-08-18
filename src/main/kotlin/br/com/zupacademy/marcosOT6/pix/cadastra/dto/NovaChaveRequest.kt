@@ -15,8 +15,8 @@ class NovaChaveRequest(
 ){
 
     fun toModel(): ChaveEntidade {
-        /*Se for selecionado chave aleatória independente do valor
-        colocado no JSON para o valorDaChave sempre será gerada uma chave aleatória*/
+        /*Se for selecionado chave aleatória
+        não deve ser passado o campo valorDaChave no JSON*/
         return ChaveEntidade(
             tipoDeConta = tipoDeConta,
             tipoDeChave = tipoDeChave,

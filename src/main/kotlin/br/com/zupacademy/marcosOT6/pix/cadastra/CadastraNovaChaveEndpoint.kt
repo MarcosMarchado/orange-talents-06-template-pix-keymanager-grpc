@@ -5,6 +5,7 @@ import br.com.zupacademy.marcosOT6.pix.CadastraChavePixResponse
 import br.com.zupacademy.marcosOT6.pix.PixServiceGrpc
 import br.com.zupacademy.marcosOT6.pix.cadastra.dto.NovaChaveRequest
 import br.com.zupacademy.marcosOT6.pix.validacao.exception.ChaveJaExistenteException
+import br.com.zupacademy.marcosOT6.pix.validacao.exception.ValorDesconhecido
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import org.slf4j.Logger
@@ -33,16 +34,21 @@ class CadastraNovaChaveEndpoint(
                                 .setPixId(novaChave?.chaveId.toString())
                                 .build())
             responseObserver?.onCompleted()
-        }catch (exception: ConstraintViolationException){
-            val error = Status.INVALID_ARGUMENT
+        }catch (exception: Exception){
+            when(exception){
+                is ConstraintViolationException, is ValorDesconhecido -> {
+                    val error = Status.INVALID_ARGUMENT
                                 .augmentDescription(exception.message)
                                 .asRuntimeException()
-            responseObserver?.onError(error)
-        }catch (exception: ChaveJaExistenteException){
-            val error = Status.ALREADY_EXISTS
+                    responseObserver?.onError(error)
+                }
+                is ChaveJaExistenteException -> {
+                    val error = Status.ALREADY_EXISTS
                                 .augmentDescription(exception.message)
                                 .asRuntimeException()
-            responseObserver?.onError(error)
+                    responseObserver?.onError(error)
+                }
+            }
         }
 
     }
