@@ -1,10 +1,9 @@
 package br.com.zupacademy.marcosOT6.pix.cadastra.dto
 
 import br.com.zupacademy.marcosOT6.pix.cadastra.ChaveEntidade
+import br.com.zupacademy.marcosOT6.pix.cadastra.ContaAssociada
 import br.com.zupacademy.marcosOT6.pix.cadastra.TipoDeChave
 import br.com.zupacademy.marcosOT6.pix.cadastra.TipoDeConta
-import br.com.zupacademy.marcosOT6.pix.validacao.ChavePix
-import io.micronaut.core.annotation.Introspected
 import java.util.*
 
 class NovaChaveRequest(
@@ -14,10 +13,11 @@ class NovaChaveRequest(
     val tipoDeConta: TipoDeConta
 ){
 
-    fun toModel(): ChaveEntidade {
+    fun toModel(contaAssociada: ContaAssociada): ChaveEntidade {
         /*Se for selecionado chave aleatória
         não deve ser passado o campo valorDaChave no JSON*/
         return ChaveEntidade(
+            conta = contaAssociada,
             tipoDeConta = tipoDeConta,
             tipoDeChave = tipoDeChave,
             codigoDoCliente = codigoDoCliente,
