@@ -1,0 +1,10 @@
+package br.com.zupacademy.marcosOT6.pix.cadastra
+
+import io.micronaut.data.annotation.Repository
+import io.micronaut.data.jpa.repository.JpaRepository
+import java.util.*
+
+@Repository
+interface ChaveRepository : JpaRepository<ChaveEntidade, UUID> {
+    fun existsByValorDaChave(valorDaChave: String) : Boolean
+}

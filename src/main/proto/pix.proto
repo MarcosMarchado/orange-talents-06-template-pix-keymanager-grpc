@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.com.zupacademy.marcosOT6.pix";
+option java_outer_classname = "PixServiceOuterClass";
+option objc_class_prefix = "HLW";
+
+package br.com.zupacademy.marcosOT6.pix;
+
+service PixService {
+  rpc cadastrarChave (CadastraChavePixRequest) returns (CadastraChavePixResponse) {}
+}
+
+enum TipoDeChave {
+  UNKNOW_TIPO_CHAVE = 0;
+  CHAVE_ALEATORIA   = 1;
+  CPF               = 2;
+  EMAIL             = 3;
+  TELEFONE          = 4;
+}
+
+enum TipoDeConta {
+  UNKNOW_TIPO_CONTA = 0;
+  CONTA_CORRENTE    = 1;
+  CONTA_POUPANCA    = 2;
+}
+
+message CadastraChavePixRequest {
+  string codigoInterno    = 1;
+  TipoDeChave tipoDeChave = 2;
+  TipoDeConta tipoDeConta = 3;
+  string valorDaChave     = 4;
+}
+
+message CadastraChavePixResponse {
+  string pixId = 1;
+}
