@@ -37,7 +37,7 @@ class CadastraNovaChaveService(
 
             return repository.save(novaChaveRequest.toModel(contaAssociada))
         }catch (exception: HttpClientResponseException){
-            throw ObjectNotFoundException("Conta não encontrada.")
+            throw ObjectNotFoundException("Conta não encontrada no sistema Itaú.")
         }
 
     }
