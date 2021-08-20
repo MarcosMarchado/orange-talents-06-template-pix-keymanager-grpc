@@ -12,7 +12,8 @@ class NovaChaveRequest(
     val tipoDeChave: TipoDeChave,
     val tipoDeConta: TipoDeConta
 ){
-
+    /*TODO: Quando for chave aleatória o valor da chave retornado deve ser salvo
+    *  / deve receber um outro parametro que seria a chave de retorno do sistema do Banco Central*/
     fun toModel(contaAssociada: ContaAssociada): ChaveEntidade {
         /*Se for selecionado chave aleatória
         não deve ser passado o campo valorDaChave no JSON*/
