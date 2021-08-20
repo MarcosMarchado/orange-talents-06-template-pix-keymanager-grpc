@@ -6,5 +6,6 @@ import java.util.*
 
 @Repository
 interface ChaveRepository : JpaRepository<ChaveEntidade, UUID> {
+    fun findByChaveIdAndCodigoDoCliente(idChave: UUID, idCliente: String) : Optional<ChaveEntidade>
     fun existsByValorDaChave(valorDaChave: String) : Boolean
 }

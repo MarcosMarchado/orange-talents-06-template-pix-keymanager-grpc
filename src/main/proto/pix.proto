@@ -11,6 +11,10 @@ service PixService {
   rpc cadastrarChave (CadastraChavePixRequest) returns (CadastraChavePixResponse) {}
 }
 
+service PixServiceRemover {
+  rpc removerChave (RemoverChavePixRequest) returns (RemoverChavePixResponse) {}
+}
+
 enum TipoDeChave {
   UNKNOW_TIPO_CHAVE = 0;
   CHAVE_ALEATORIA   = 1;
@@ -33,5 +37,15 @@ message CadastraChavePixRequest {
 }
 
 message CadastraChavePixResponse {
-  string pixId = 1;
+  string pixId            = 1;
+}
+
+message RemoverChavePixRequest {
+  string codigoInterno    = 1;
+  string pixId            = 2;
+}
+
+message RemoverChavePixResponse {
+  string codigoInterno    = 1;
+  string pixId            = 2;
 }
