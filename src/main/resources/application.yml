@@ -23,3 +23,5 @@ http:
   services:
     ERP:
       url: http://localhost:9091/api/v1/
+    BCB:
+      url: http://localhost:8082/api/v1/pix/keys/

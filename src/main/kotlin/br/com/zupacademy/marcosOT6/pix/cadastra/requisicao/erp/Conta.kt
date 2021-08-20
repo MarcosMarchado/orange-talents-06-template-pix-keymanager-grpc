@@ -1,4 +1,4 @@
-package br.com.zupacademy.marcosOT6.pix.cadastra.requisicao
+package br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp
 
 import br.com.zupacademy.marcosOT6.pix.cadastra.ContaAssociada
 

@@ -1,4 +1,4 @@
-package br.com.zupacademy.marcosOT6.pix.cadastra.requisicao
+package br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Get
