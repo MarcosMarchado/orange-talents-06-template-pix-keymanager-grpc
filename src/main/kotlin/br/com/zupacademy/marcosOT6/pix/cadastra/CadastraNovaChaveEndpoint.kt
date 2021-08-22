@@ -22,38 +22,38 @@ class CadastraNovaChaveEndpoint(
     val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun cadastrarChave(
-        request: CadastraChavePixRequest?,
-        responseObserver: StreamObserver<CadastraChavePixResponse>?
+        request: CadastraChavePixRequest,
+        responseObserver: StreamObserver<CadastraChavePixResponse>
     ) {
-
-        val chaveRequest: NovaChaveRequest = request!!.toModel()
+        /*Converte para um modelo interno para facilitar a manipulação dos dados*/
+        val chaveRequest: NovaChaveRequest = request.toModel()
 
         try {
-            val novaChave: ChaveEntidade? = cadastraNovaChaveService.cadastraChave(chaveRequest)
-            responseObserver?.onNext(CadastraChavePixResponse
+            val novaChave: ChaveEntidade = cadastraNovaChaveService.cadastraChave(chaveRequest)
+            responseObserver.onNext(CadastraChavePixResponse
                                 .newBuilder()
-                                .setPixId(novaChave?.chaveId.toString())
+                                .setPixId(novaChave.chaveId.toString())
                                 .build())
-            responseObserver?.onCompleted()
+            responseObserver.onCompleted()
         }catch (exception: Exception){
             when(exception){
                 is ConstraintViolationException, is ValorDesconhecidoException -> {
                     val error = Status.INVALID_ARGUMENT
                                 .augmentDescription(exception.message)
                                 .asRuntimeException()
-                    responseObserver?.onError(error)
+                    responseObserver.onError(error)
                 }
                 is ChaveJaExistenteException -> {
                     val error = Status.ALREADY_EXISTS
                                 .augmentDescription(exception.message)
                                 .asRuntimeException()
-                    responseObserver?.onError(error)
+                    responseObserver.onError(error)
                 }
                 is ObjectNotFoundException -> {
                     val error = Status.NOT_FOUND
                                 .augmentDescription(exception.message)
                                 .asRuntimeException()
-                    responseObserver?.onError(error)
+                    responseObserver.onError(error)
                 }
             }
         }

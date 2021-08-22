@@ -19,19 +19,33 @@ annotation class ChavePix(val message: String = "Valor não atende ao formato se
 @Singleton
 class ChaveValidator : ConstraintValidator<ChavePix, ChaveEntidade> {
     override fun isValid(
-        value: ChaveEntidade?,
+        value: ChaveEntidade,
         annotationMetadata: AnnotationValue<ChavePix>,
         context: ConstraintValidatorContext
     ): Boolean {
 
-        when(value?.tipoDeChave){
-            TipoDeChave.TELEFONE -> return value.valorDaChave.matches("^\\+[1-9][0-9]\\d{1,14}$".toRegex())
+        when(value.tipoDeChave){
+            TipoDeChave.TELEFONE -> {
+                context.messageTemplate("Telefone inválido.")
+                return value.valorDaChave.matches("^\\+[1-9][0-9]\\d{1,14}$".toRegex())
+            }
 
-            TipoDeChave.CPF -> return value.valorDaChave.matches("^[0-9]{11}\$".toRegex())
+            TipoDeChave.CPF -> {
+                context.messageTemplate("CPF inválido.")
+                return value.valorDaChave.matches("^[0-9]{11}\$".toRegex())
+            }
 
-            TipoDeChave.EMAIL -> return value.valorDaChave.contains("@")
+            TipoDeChave.EMAIL -> {
+                context.messageTemplate("Email inválido.")
+                return value.valorDaChave.contains("@")
+            }
 
-            else -> return true
+            TipoDeChave.CHAVE_ALEATORIA -> {
+                context.messageTemplate("Valor inválido para chave aleatória.")
+                return value.valorDaChave.isNullOrBlank()
+            }
+
+            else -> return false
         }
 
     }

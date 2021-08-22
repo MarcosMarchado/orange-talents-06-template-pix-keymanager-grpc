@@ -10,7 +10,7 @@ import javax.validation.constraints.Size
 @ChavePix
 @Table(name = "chave")
 data class ChaveEntidade(
-    @field:Size(max = 77) val valorDaChave: String,
+    @field:Size(max = 77) var valorDaChave: String,
     @field:NotBlank val codigoDoCliente: String,
     @field:Enumerated(EnumType.STRING) @NotBlank val tipoDeChave: TipoDeChave,
     @field:Enumerated(EnumType.STRING) @NotBlank val tipoDeConta: TipoDeConta,
@@ -19,4 +19,9 @@ data class ChaveEntidade(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var chaveId: UUID? = null
+
+    fun associaChave(chaveAleatoria: String){
+        this.valorDaChave = chaveAleatoria
+    }
+
 }

@@ -8,6 +8,10 @@ plugins {
     id("com.google.protobuf") version "0.8.15"
 }
 
+allOpen {
+    annotation("javax.inject.Singleton")
+}
+
 version = "0.1"
 group = "br.com.zupacademy.marcosOT6.pix"
 

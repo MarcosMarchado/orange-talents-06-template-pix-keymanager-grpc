@@ -280,7 +280,7 @@ internal class CadastraNovaChaveEndpointTest(){
         }
 
         with(error){
-            assertEquals("save.entity: Valor não atende ao formato selecionado.", status.description)
+            assertEquals("save.entity: CPF inválido.", status.description)
             assertEquals(Status.INVALID_ARGUMENT.code, status.code)
         }
     }
@@ -308,7 +308,7 @@ internal class CadastraNovaChaveEndpointTest(){
         }
 
         with(error){
-            assertEquals("save.entity: Valor não atende ao formato selecionado.", status.description)
+            assertEquals("save.entity: Email inválido.", status.description)
             assertEquals(Status.INVALID_ARGUMENT.code, status.code)
         }
     }
@@ -336,7 +336,7 @@ internal class CadastraNovaChaveEndpointTest(){
         }
 
         with(error){
-            assertEquals("save.entity: Valor não atende ao formato selecionado.", status.description)
+            assertEquals("save.entity: Telefone inválido.", status.description)
             assertEquals(Status.INVALID_ARGUMENT.code, status.code)
         }
     }
