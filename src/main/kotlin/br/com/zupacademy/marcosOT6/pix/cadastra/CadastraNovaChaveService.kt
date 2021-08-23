@@ -2,14 +2,11 @@ package br.com.zupacademy.marcosOT6.pix.cadastra
 
 import br.com.zupacademy.marcosOT6.pix.cadastra.dto.NovaChaveRequest
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastraChavePixNoBCB
-import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastraChavePixResponse
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastrarChavePixRequest
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.BuscaInformacoesDaConta
-import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.Conta
 import br.com.zupacademy.marcosOT6.pix.validacao.exception.ChaveJaExistenteException
 import br.com.zupacademy.marcosOT6.pix.validacao.exception.ObjectNotFoundException
 import br.com.zupacademy.marcosOT6.pix.validacao.exception.ValorDesconhecidoException
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import org.slf4j.Logger
@@ -41,13 +38,24 @@ class CadastraNovaChaveService(
         }
 
         try {
-            val conta: HttpResponse<Conta> = buscaInformacoesDaConta.busca(novaChaveRequest.codigoDoCliente, novaChaveRequest.tipoDeConta.name)
-            val contaAssociada: ContaAssociada = conta.body().toModel()
-            val chave: ChaveEntidade = novaChaveRequest.toModel(contaAssociada)
-            repository.save(chave) /*Passa primeiro pela validação dos dados antes da requisição para o BCB*/
+            val chave: ChaveEntidade = buscaInformacoesDaConta
+                .busca(
+                    novaChaveRequest.codigoDoCliente,
+                    novaChaveRequest.tipoDeConta.name
+                ).run {
+                    val contaAssociada = body().toModel()
+                    novaChaveRequest.toModel(contaAssociada)
+                }
 
-            val response: HttpResponse<CadastraChavePixResponse> = cadastraChavePixNoBCB.cadastra(CadastrarChavePixRequest(chave))
-            chave.associaChave(response.body().key) /*Associa a chave de retorno do BCB*/
+            repository.save(chave)
+
+            cadastraChavePixNoBCB
+                .cadastra(CadastrarChavePixRequest(chave))
+                .run {
+                    /*Associa a chave de retorno do BCB*/
+                    chave.associaChave(body().key)
+                }
+
             return chave
         }catch (exception: HttpClientResponseException){
             when(exception.status){
