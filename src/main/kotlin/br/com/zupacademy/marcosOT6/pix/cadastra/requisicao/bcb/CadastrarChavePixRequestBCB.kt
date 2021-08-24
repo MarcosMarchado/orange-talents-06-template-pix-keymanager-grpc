@@ -3,7 +3,7 @@ package br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb
 import br.com.zupacademy.marcosOT6.pix.cadastra.ChaveEntidade
 
 
-data class CadastrarChavePixRequest (
+data class CadastrarChavePixRequestBCB (
     val chave: ChaveEntidade
 ){
     val key: String = chave.valorDaChave

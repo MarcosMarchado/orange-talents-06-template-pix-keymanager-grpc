@@ -10,5 +10,5 @@ import io.micronaut.http.client.annotation.Client
 interface CadastraChavePixNoBCB {
     /*Só vai cadastrar a chave no nosso sistema quando der Ok no BCB*/
     @Post(produces = [MediaType.APPLICATION_XML], consumes = [MediaType.APPLICATION_XML])
-    fun cadastra(@Body request: CadastrarChavePixRequest) : HttpResponse<CadastraChavePixResponse>
+    fun cadastra(@Body request: CadastrarChavePixRequestBCB) : HttpResponse<CadastraChavePixResponseBCB>
 }

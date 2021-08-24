@@ -2,7 +2,7 @@ package br.com.zupacademy.marcosOT6.pix.cadastra
 
 import br.com.zupacademy.marcosOT6.pix.cadastra.dto.NovaChaveRequest
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastraChavePixNoBCB
-import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastrarChavePixRequest
+import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastrarChavePixRequestBCB
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.BuscaInformacoesDaConta
 import br.com.zupacademy.marcosOT6.pix.validacao.exception.ChaveJaExistenteException
 import br.com.zupacademy.marcosOT6.pix.validacao.exception.ObjectNotFoundException
@@ -50,7 +50,7 @@ class CadastraNovaChaveService(
             repository.save(chave)
 
             cadastraChavePixNoBCB
-                .cadastra(CadastrarChavePixRequest(chave))
+                .cadastra(CadastrarChavePixRequestBCB(chave))
                 .run {
                     /*Associa a chave de retorno do BCB*/
                     chave.associaChave(body().key)
@@ -60,7 +60,7 @@ class CadastraNovaChaveService(
         }catch (exception: HttpClientResponseException){
             when(exception.status){
                 HttpStatus.UNPROCESSABLE_ENTITY ->
-                    throw ChaveJaExistenteException("A chave ${novaChaveRequest.valorDaChave} já está cadastrada no Banco Central.")
+                    throw ChaveJaExistenteException("Chave já está cadastrada no Banco Central.")
                 else -> throw ObjectNotFoundException("Conta não encontrada no sistema Itaú.")
             }
         }

@@ -3,10 +3,16 @@ package br.com.zupacademy.marcosOT6.pix.cadastra
 import br.com.zupacademy.marcosOT6.pix.*
 import br.com.zupacademy.marcosOT6.pix.TipoDeChave
 import br.com.zupacademy.marcosOT6.pix.TipoDeConta
+import br.com.zupacademy.marcosOT6.pix.cadastra.dto.NovaChaveRequest
+import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastraChavePixNoBCB
+import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastraChavePixResponseBCB
+import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.bcb.CadastrarChavePixRequestBCB
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.BuscaInformacoesDaConta
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.Conta
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.Instituicao
 import br.com.zupacademy.marcosOT6.pix.cadastra.requisicao.erp.Titular
+import br.com.zupacademy.marcosOT6.pix.validacao.exception.ChaveJaExistenteException
+import br.com.zupacademy.marcosOT6.pix.validacao.exception.ObjectNotFoundException
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -22,6 +28,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,6 +43,10 @@ internal class CadastraNovaChaveEndpointTest(){
     lateinit var pixClientGrpc: PixServiceGrpc.PixServiceBlockingStub
     @Inject
     lateinit var buscaInformacoesDaConta: BuscaInformacoesDaConta
+    @Inject
+    lateinit var cadastraChavePixNoBCB: CadastraChavePixNoBCB
+
+    val LOGGER: Logger = LoggerFactory.getLogger(this::class.java)
 
     @BeforeEach
     fun setup(){
@@ -42,8 +55,9 @@ internal class CadastraNovaChaveEndpointTest(){
 
     @Test
     fun `Deve cadastrar uma chave pix aleatoria`(){
-
-        val contaResponse = contaResponse()
+        /*Monta cenário para gerar uma chave aleatória*/
+        val chaveAleatoria = UUID.randomUUID().toString()
+        val contaResponse: Conta = contaResponse()
 
         val request = CadastraChavePixRequest
                             .newBuilder()
@@ -52,13 +66,22 @@ internal class CadastraNovaChaveEndpointTest(){
                             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
                             .build()
 
+        val requestBCB: CadastrarChavePixRequestBCB = chavePixRequestBCB(request, contaResponse.toModel())
+
+        /*ERP*/
         Mockito
             .`when`(buscaInformacoesDaConta.busca(request.codigoInterno, request.tipoDeConta.name))
             .thenReturn(HttpResponse.ok(contaResponse))
+        /*BCB*/
+        Mockito
+            .`when`(cadastraChavePixNoBCB.cadastra(requestBCB))
+            .thenReturn(HttpResponse.ok(chavePixResponseBCB(chaveAleatoria)))
 
         val response: CadastraChavePixResponse = pixClientGrpc.cadastrarChave(request)
+
         with(response){
             assertNotNull(pixId)
+            assertTrue(repository.existsByValorDaChave(chaveAleatoria)) /*Testa efeito colateral*/
         }
     }
 
@@ -73,6 +96,12 @@ internal class CadastraNovaChaveEndpointTest(){
             .setTipoDeChave(TipoDeChave.CPF)
             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
             .build()
+
+        val requestBCB: CadastrarChavePixRequestBCB = chavePixRequestBCB(request, contaResponse.toModel())
+
+        Mockito
+            .`when`(cadastraChavePixNoBCB.cadastra(requestBCB))
+            .thenReturn(HttpResponse.ok(chavePixResponseBCB(CPF)))
 
         Mockito
             .`when`(buscaInformacoesDaConta.busca(request.codigoInterno, request.tipoDeConta.name))
@@ -97,6 +126,12 @@ internal class CadastraNovaChaveEndpointTest(){
             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
             .build()
 
+        val requestBCB: CadastrarChavePixRequestBCB = chavePixRequestBCB(request, contaResponse.toModel())
+
+        Mockito
+            .`when`(cadastraChavePixNoBCB.cadastra(requestBCB))
+            .thenReturn(HttpResponse.ok(chavePixResponseBCB(email)))
+
         Mockito
             .`when`(buscaInformacoesDaConta.busca(request.codigoInterno, request.tipoDeConta.name))
             .thenReturn(HttpResponse.ok(contaResponse))
@@ -119,6 +154,12 @@ internal class CadastraNovaChaveEndpointTest(){
             .setTipoDeChave(TipoDeChave.TELEFONE)
             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
             .build()
+
+        val requestBCB: CadastrarChavePixRequestBCB = chavePixRequestBCB(request, contaResponse.toModel())
+
+        Mockito
+            .`when`(cadastraChavePixNoBCB.cadastra(requestBCB))
+            .thenReturn(HttpResponse.ok(chavePixResponseBCB(telefone)))
 
         Mockito
             .`when`(buscaInformacoesDaConta.busca(request.codigoInterno, request.tipoDeConta.name))
@@ -348,14 +389,14 @@ internal class CadastraNovaChaveEndpointTest(){
         val request = CadastraChavePixRequest
             .newBuilder()
             .setValorDaChave(email)
-            .setCodigoInterno("c56dfef4-7901-44fb-84e2-a2cefb157890")
+            .setCodigoInterno("84e2-a2cefb157890")
             .setTipoDeChave(TipoDeChave.EMAIL)
             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
             .build()
 
         Mockito
             .`when`(buscaInformacoesDaConta.busca(request.codigoInterno, request.tipoDeConta.name))
-            .thenThrow(HttpClientResponseException::class.java)
+            .thenThrow(ObjectNotFoundException("Conta não encontrada no sistema Itaú."))
 
         val error = assertThrows<StatusRuntimeException> {
             pixClientGrpc.cadastrarChave(request)
@@ -367,7 +408,38 @@ internal class CadastraNovaChaveEndpointTest(){
         }
     }
 
+    @Test
+    fun `Deve dar erro ao cadastrar chave ja existente no BCB`(){
+        val email = "marcos@gmail.com"
+        val contaResponse = contaResponse()
 
+        val request = CadastraChavePixRequest
+            .newBuilder()
+            .setValorDaChave(email)
+            .setCodigoInterno("c56dfef4-7901-44fb-84e2-a2cefb157890")
+            .setTipoDeChave(TipoDeChave.EMAIL)
+            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+            .build()
+
+        val requestBCB: CadastrarChavePixRequestBCB = chavePixRequestBCB(request, contaResponse.toModel())
+
+        Mockito
+            .`when`(cadastraChavePixNoBCB.cadastra(requestBCB))
+            .thenThrow(ChaveJaExistenteException("Chave já está cadastrada no Banco Central."))
+
+        Mockito
+            .`when`(buscaInformacoesDaConta.busca(request.codigoInterno, request.tipoDeConta.name))
+            .thenReturn(HttpResponse.ok(contaResponse))
+
+        val error = assertThrows<StatusRuntimeException> {
+            pixClientGrpc.cadastrarChave(request)
+        }
+
+        with(error){
+            assertEquals("Chave já está cadastrada no Banco Central.", status.description)
+            assertEquals(Status.ALREADY_EXISTS.code, status.code)
+        }
+    }
 
     private fun contaResponse(): Conta {
          return Conta(
@@ -378,9 +450,27 @@ internal class CadastraNovaChaveEndpointTest(){
         )
     }
 
+    private fun chavePixResponseBCB(key: String): CadastraChavePixResponseBCB {
+       return CadastraChavePixResponseBCB(key = key, createdAt = "2021-08-23T14:35:42.147Z")
+    }
+
+    private fun chavePixRequestBCB(
+        request: CadastraChavePixRequest,
+        contaAssociada: ContaAssociada
+    ): CadastrarChavePixRequestBCB {
+        val requestModel: NovaChaveRequest = request.toModel()
+        val chave = requestModel.toModel(contaAssociada)
+        return CadastrarChavePixRequestBCB(chave)
+    }
+
+    @MockBean(CadastraChavePixNoBCB::class)
+    fun mockCadastraChavePixNoBCB(): CadastraChavePixNoBCB {
+        return Mockito.mock(CadastraChavePixNoBCB::class.java)
+    }
+
     /*Mockando BuscaInformacoesDaConta para requisições ao ERP*/
     @MockBean(BuscaInformacoesDaConta::class) /*Informa a classe para substituir pelo o Mock*/
-    fun mockBuscaInformacoesDaConta(): BuscaInformacoesDaConta? {
+    fun mockBuscaInformacoesDaConta(): BuscaInformacoesDaConta {
         return Mockito.mock(BuscaInformacoesDaConta::class.java)
     }
 
