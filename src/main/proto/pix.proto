@@ -15,6 +15,10 @@ service PixServiceRemover {
   rpc removerChave (RemoverChavePixRequest) returns (RemoverChavePixResponse) {}
 }
 
+service PixServiceDetalhes {
+  rpc detalharChave (DetalhesChavePixRequest) returns (DetalhesChavePixResponse) {}
+}
+
 enum TipoDeChave {
   UNKNOW_TIPO_CHAVE = 0;
   CHAVE_ALEATORIA   = 1;
@@ -49,3 +53,46 @@ message RemoverChavePixResponse {
   string codigoInterno    = 1;
   string pixId            = 2;
 }
+
+message DetalhesChavePixRequest {
+  message FiltroPorPixId {
+    string codigoInterno    = 1;
+    string pixId            = 2;
+  }
+
+  oneof filtro {
+    FiltroPorPixId keyManager     = 1; /*Busca pelo sistema KeyManager*/
+    string valorDaChave           = 2;
+  }
+}
+
+message Conta {
+  string titular              = 1;
+  string CPF                  = 2;
+  string nomeDaInstituicao    = 3;
+  string agencia              = 4;
+  string numero               = 5;
+  TipoDeConta tipoDeConta     = 6;
+}
+
+message DetalhesChavePixResponse {
+
+  string pixId                = 1;
+  string codigoInterno        = 2;
+
+  TipoDeChave tipoDeChave     = 3;
+  string valorDaChave         = 4;
+
+  Conta conta                 = 5;
+  string dataCriacao          = 6;
+}
+
+    /*Pix ID (opcional - necessário somente para abordagem 1);
+    Identificador do cliente (opcional - necessário somente para abordagem 1);
+    Tipo da chave;
+    Valor da chave;
+    Nome e CPF do titular da conta;
+    Dados da conta vinculada a chave Pix:
+    nome da instituição financeira;
+    agência, número da conta e tipo da conta (Corrente ou Poupança);
+    Data/hora de registro ou criação da chave;*/
