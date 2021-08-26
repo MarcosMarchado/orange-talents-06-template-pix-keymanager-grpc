@@ -19,6 +19,10 @@ service PixServiceDetalhes {
   rpc detalharChave (DetalhesChavePixRequest) returns (DetalhesChavePixResponse) {}
 }
 
+service PixServiceListagem {
+  rpc listarChaves (ListarChavesPixRequest) returns (ListarChavesPixResponse) {}
+}
+
 enum TipoDeChave {
   UNKNOW_TIPO_CHAVE = 0;
   CHAVE_ALEATORIA   = 1;
@@ -87,12 +91,19 @@ message DetalhesChavePixResponse {
   string dataCriacao          = 6;
 }
 
-    /*Pix ID (opcional - necessário somente para abordagem 1);
-    Identificador do cliente (opcional - necessário somente para abordagem 1);
-    Tipo da chave;
-    Valor da chave;
-    Nome e CPF do titular da conta;
-    Dados da conta vinculada a chave Pix:
-    nome da instituição financeira;
-    agência, número da conta e tipo da conta (Corrente ou Poupança);
-    Data/hora de registro ou criação da chave;*/
+message ListarChavesPixRequest {
+  string codigoInterno        = 1;
+}
+
+message ListarChavesPixResponse {
+  repeated Chave chaves       = 1;
+}
+
+message Chave {
+  string pixId                = 1;
+  string codigoInterno        = 2;
+  TipoDeChave tipoDeChave     = 3;
+  string valorDaChave         = 4;
+  TipoDeConta tipoDeConta     = 5;
+  string dataCriacao          = 6;
+}
