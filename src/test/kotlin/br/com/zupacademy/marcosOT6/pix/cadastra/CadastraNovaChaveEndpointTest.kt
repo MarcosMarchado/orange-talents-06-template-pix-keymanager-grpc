@@ -455,7 +455,7 @@ internal class CadastraNovaChaveEndpointTest(){
     }
 
     private fun chavePixRequestBCB(
-        request: CadastraChavePixRequest,
+        request: CadastraChavePixRequest, /*Request gerado pelo .proto*/
         contaAssociada: ContaAssociada
     ): CadastrarChavePixRequestBCB {
         val requestModel: NovaChaveRequest = request.toModel()

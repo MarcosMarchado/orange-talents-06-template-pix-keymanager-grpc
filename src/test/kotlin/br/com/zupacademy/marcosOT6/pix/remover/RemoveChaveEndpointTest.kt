@@ -145,7 +145,7 @@ internal class RemoveChaveEndpointTest() {
     }
 
     @Factory
-    class clientGrpc {
+    class ClientGrpc {
         @Singleton
         fun clientPix(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
                 PixServiceRemoverGrpc.PixServiceRemoverBlockingStub? {

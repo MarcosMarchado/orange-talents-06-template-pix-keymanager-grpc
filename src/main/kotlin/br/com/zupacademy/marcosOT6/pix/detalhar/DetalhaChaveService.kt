@@ -74,8 +74,6 @@ class DetalhaChaveService(
     }
 
     private fun buscaPorValorDaChave(request: DetalhesChavePixRequest): ChaveEntidade {
-        when { request.valorDaChave.isNullOrBlank() -> ("Valor da chave obrigatório.") }
-
         val possivelChave = repository.findByValorDaChave(request.valorDaChave)
         if (possivelChave.isEmpty) {
             return buscaDetalhesChavePix.busca(request.valorDaChave)
