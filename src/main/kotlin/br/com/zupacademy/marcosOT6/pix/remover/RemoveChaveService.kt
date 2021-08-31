@@ -40,7 +40,7 @@ class RemoveChaveService(
                     throw ObjectNotFoundException("Chave pix não encontrada no BCB.")
             }
 
-        repository.delete(chave)
+        repository.deleteById(chaveId)
 
     }
 
