@@ -3,10 +3,10 @@ micronaut:
     name: pixOt6
 datasources:
   default:
-    url: jdbc:postgresql://localhost:5433/postgres
+    url: ${DB_URI:`jdbc:postgresql://localhost:5433/postgres`}
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     schema-generate: CREATE_DROP
     dialect: POSTGRES
 
@@ -22,6 +22,6 @@ jpa.default.properties.hibernate.bytecode.provider: none
 http:
   services:
     ERP:
-      url: http://localhost:9091/api/v1/
+      url: ${ITAU_URL:`http://localhost:9091/api/v1/`}
     BCB:
-      url: http://localhost:8082/api/v1/pix/keys/
+      url: ${BCB_URL:`http://localhost:8082/api/v1/pix/keys/`}
